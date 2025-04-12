@@ -21,7 +21,7 @@ const SideMenu = () => {
 
   return (
     <>
-      <SheetHeader className="border-b border-solid border-[var(--secondary)] p-5">
+      <SheetHeader className="border-b border-solid border-secondary p-5">
         <SheetTitle>Menu</SheetTitle>
       </SheetHeader>
 
@@ -36,19 +36,19 @@ const SideMenu = () => {
             </Avatar>
             <h2 className="font-bold">{data.user?.name}</h2>
           </div>
-          <Button onClick={handleLogoutClick} size="icon">
+          <Button onClick={handleLogoutClick} size="icon" variant="outline">
             <LogOutIcon />
           </Button>
         </div>
       ) : (
-        <div className="flex flex-col px-5 py-4 gap-3">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-3 px-5 py-4">
+          <div className="flex items-center gap-3">
             <UserIcon size={32} />
             <h2 className="font-bold">Olá, faça seu login!</h2>
           </div>
           <Button
             onClick={handleLoginClick}
-            className="bg-[var(--primary)] w-full justify-start"
+            className="bg-primary w-full justify-start"
           >
             <LogInIcon className="mr-2" />
             Fazer Login
@@ -56,25 +56,27 @@ const SideMenu = () => {
         </div>
       )}
 
-      <div className="flex flex-col gap-3 px-5">
-        <Button variant="outline" className="justify-start" asChild>
-          <Link href="/">
-            <HomeIcon size={18} className="mr-2" />
-            Início
-          </Link>
-        </Button>
-      </div>
-
-      {data?.user && (
+      <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-3 px-5">
           <Button variant="outline" className="justify-start" asChild>
-            <Link href="/bookings">
-              <Calendar1Icon size={18} className="mr-2" />
-              Agendamentos
+            <Link href="/">
+              <HomeIcon size={18} className="mr-2" />
+              Início
             </Link>
           </Button>
         </div>
-      )}
+
+        {data?.user && (
+          <div className="flex flex-col gap-3 px-5">
+            <Button variant="outline" className="justify-start" asChild>
+              <Link href="/bookings">
+                <Calendar1Icon size={18} className="mr-2" />
+                Agendamentos
+              </Link>
+            </Button>
+          </div>
+        )}
+      </div>
     </>
   );
 };
