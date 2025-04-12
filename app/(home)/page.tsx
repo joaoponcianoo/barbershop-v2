@@ -1,5 +1,6 @@
 import Header from "../components/Header";
 import Search from "./components/Search";
+import BookingItem from "../components/BookingItem";
 import { format } from "date-fns/format";
 import { ptBR } from "date-fns/locale";
 
@@ -17,6 +18,13 @@ export default async function Home() {
 
       <div className="mt-6 px-5">
         <Search />
+      </div>
+
+      <div className="mt-6 px-5">
+        <h2 className="text-xs uppercase text-gray-400 font-bold mb-3">
+          Agendamentos
+        </h2>
+        <BookingItem />
       </div>
     </>
   );
