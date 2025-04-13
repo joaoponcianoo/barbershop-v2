@@ -19,9 +19,11 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import { generateDayTimeList } from "../utils/hours";
 import format from "date-fns/format";
-import { setHours, setMinutes, sub } from "date-fns";
+import { set, setHours, setMinutes, sub } from "date-fns";
 import { saveBooking } from "../actions/saveBooking";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface ServiceItemProps {
   service: BarbershopServices;
@@ -34,7 +36,9 @@ const ServiceItem = ({
   barbershop,
   isAuthenticated,
 }: ServiceItemProps) => {
+  const router = useRouter();
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
+  const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const { data } = useSession();
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [hour, setHour] = useState<String | undefined>();
@@ -74,6 +78,19 @@ const ServiceItem = ({
         date: newDate,
         userId: (data.user as any).id,
       });
+
+      setSheetIsOpen(false);
+      setDate(undefined);
+      setHour(undefined);
+      toast("Reserva realizada com sucesso!", {
+        description: format(newDate, "'Para 'dd 'de' MMMM 'às' HH':'mm'.'", {
+          locale: ptBR,
+        }),
+        action: {
+          label: "Visualizar",
+          onClick: () => router.push("/bookings"),
+        },
+      });
     } catch (error) {
     } finally {
       setIsSubmitLoading(false);
@@ -109,7 +126,7 @@ const ServiceItem = ({
                   currency: "BRL",
                 }).format(service.price)}
               </p>
-              <Sheet>
+              <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
                 <SheetTrigger asChild>
                   <Button
                     onClick={handleBookingClick}
