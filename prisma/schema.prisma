@@ -30,6 +30,7 @@ model Barbershops {
   createdAt   DateTime             @default(now())
   updatedAt   DateTime             @updatedAt
   services    BarbershopServices[]
+  Bookings    Bookings[]
 
   @@map("barbershops")
 }
@@ -48,14 +49,16 @@ model BarbershopServices {
 }
 
 model Bookings {
-  id        String             @id @default(uuid())
-  userId    String
-  user      User               @relation(fields: [userId], references: [id])
-  serviceId String
-  service   BarbershopServices @relation(fields: [serviceId], references: [id])
-  date      DateTime
-  createdAt DateTime           @default(now())
-  updatedAt DateTime           @updatedAt
+  id           String             @id @default(uuid())
+  userId       String
+  user         User               @relation(fields: [userId], references: [id])
+  serviceId    String
+  service      BarbershopServices @relation(fields: [serviceId], references: [id])
+  barbershopId String
+  barbershop   Barbershops        @relation(fields: [barbershopId], references: [id])
+  date         DateTime
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
 
   @@map("bookings")
 }
