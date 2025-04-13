@@ -6,29 +6,55 @@ import { Card, CardContent } from "@/app/components/ui/card";
 import {
   Sheet,
   SheetContent,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/app/components/ui/sheet";
 import { BarbershopServices } from "@prisma/client";
+import { Barbershops } from "@prisma/client";
 import { ptBR } from "date-fns/locale";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { generateDayTimeList } from "../utils/hours";
+import format from "date-fns/format";
 
 interface ServiceItemProps {
   service: BarbershopServices;
+  barbershop: Barbershops;
   isAuthenticated: boolean;
 }
 
-const ServiceItem = ({ service, isAuthenticated }: ServiceItemProps) => {
+const ServiceItem = ({
+  service,
+  barbershop,
+  isAuthenticated,
+}: ServiceItemProps) => {
+  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [hour, setHour] = useState<String | undefined>();
+
+  const handleDateClick = (date: Date | undefined) => {
+    setDate(date);
+    setHour(undefined);
+
+    console.log(date);
+    console.log(hour);
+  };
+
+  const hancleHourClick = (time: string) => {
+    setHour(time);
+  };
+
   const handleBookingClick = () => {
     if (!isAuthenticated) {
       return signIn("google");
     }
   };
 
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const timeList = useMemo(() => {
+    return date ? generateDayTimeList(date) : [];
+  }, [date]);
 
   return (
     <Card>
@@ -65,42 +91,104 @@ const ServiceItem = ({ service, isAuthenticated }: ServiceItemProps) => {
                     Agendar
                   </Button>
                 </SheetTrigger>
-                <SheetContent className="p-0 bg-[var(--background)]">
-                  <SheetHeader>
+                <SheetContent className="p-0">
+                  <SheetHeader className="border-b border-solid border-secondary p-5">
                     <SheetTitle>Fazer Reserva</SheetTitle>
                   </SheetHeader>
+                  <div className="py-4">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={handleDateClick}
+                      fromDate={new Date()}
+                      locale={ptBR}
+                      styles={{
+                        head_cell: {
+                          width: "100%",
+                          textTransform: "capitalize",
+                        },
+                        cell: {
+                          width: "100%",
+                        },
+                        button: {
+                          width: "100%",
+                        },
+                        nav_button_previous: {
+                          width: "32px",
+                          height: "32px",
+                        },
+                        nav_button_next: {
+                          width: "32px",
+                          height: "32px",
+                        },
+                        caption: {
+                          textTransform: "capitalize",
+                        },
+                      }}
+                    />
+                  </div>
 
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    className="rounded-md border"
-                    fromDate={new Date()}
-                    locale={ptBR}
-                    styles={{
-                      head_cell: {
-                        width: "100%",
-                        textTransform: "capitalize",
-                      },
-                      cell: {
-                        width: "100%",
-                      },
-                      button: {
-                        width: "100%",
-                      },
-                      nav_button_previous: {
-                        width: "32px",
-                        height: "32px",
-                      },
-                      nav_button_next: {
-                        width: "32px",
-                        height: "32px",
-                      },
-                      caption: {
-                        textTransform: "capitalize",
-                      },
-                    }}
-                  />
+                  {date && (
+                    <div className="flex gap-3 overflow-x-auto py-6 px-5 border-y border-solid border-secondary [&::-webkit-scrollbar]:hidden">
+                      {timeList.map((time) => (
+                        <Button
+                          onClick={() => hancleHourClick(time)}
+                          key={time}
+                          variant={hour === time ? "default" : "secondary"}
+                          className="mb-2 text-white"
+                        >
+                          {time}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="py-6 px-5">
+                    <Card>
+                      <CardContent className="flex flex-col gap-3 p-3">
+                        <div className="flex justify-between">
+                          <h2 className="font-bold text-sm">{service.name}</h2>
+                          <h3 className="font-bold text-sm">
+                            {Intl.NumberFormat("pt-BR", {
+                              style: "currency",
+                              currency: "BRL",
+                            }).format(service.price)}
+                          </h3>
+                        </div>
+                        <div className="flex justify-between">
+                          <h3 className="text-sm text-gray-400">Barbearia</h3>
+                          <h4 className="text-sm text-gray-400">
+                            {barbershop.name}
+                          </h4>
+                        </div>
+                        {date && (
+                          <div className="flex justify-between">
+                            <h3 className="text-sm text-gray-400">Data</h3>
+                            <h4 className="text-sm text-gray-400">
+                              {format(date, "dd 'de' MMMM", {
+                                locale: ptBR,
+                              })}
+                            </h4>
+                          </div>
+                        )}
+                        {hour && (
+                          <div className="flex justify-between">
+                            <h3 className="text-sm text-gray-400">Horário</h3>
+                            <h4 className="text-sm text-gray-400">{hour}</h4>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+                  <SheetFooter className="px-5">
+                    <Button
+                      variant="default"
+                      disabled={!(date && hour)}
+                      className="text-white w-full"
+                    >
+                      Confirmar Reserva
+                    </Button>
+                  </SheetFooter>
                 </SheetContent>
               </Sheet>
             </div>

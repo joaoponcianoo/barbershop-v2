@@ -13,7 +13,6 @@ interface BarbershopDetailsPageProps {
 const BarbershopDetailsPage = async ({
   params,
 }: BarbershopDetailsPageProps) => {
-
   const session = await getServerSession(authOptions);
   const barbershop = await db.barbershops.findUnique({
     where: {
@@ -30,13 +29,15 @@ const BarbershopDetailsPage = async ({
     <div>
       {barbershop && <BarbershopInfo barbershop={barbershop} />}
       <div className="flex flex-col gap-4 mt-4 px-5 ">
-        {barbershopServices.map((service) => (
-          <ServiceItem
-            key={service.id}
-            service={service}
-            isAuthenticated={!!session?.user}
-          />
-        ))}
+        {barbershop &&
+          barbershopServices.map((service) => (
+            <ServiceItem
+              key={service.id}
+              service={service}
+              barbershop={barbershop}
+              isAuthenticated={!!session?.user}
+            />
+          ))}
       </div>
     </div>
   );
