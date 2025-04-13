@@ -14,11 +14,14 @@ import {
 import { BarbershopServices } from "@prisma/client";
 import { Barbershops } from "@prisma/client";
 import { ptBR } from "date-fns/locale";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { generateDayTimeList } from "../utils/hours";
 import format from "date-fns/format";
+import { setHours, setMinutes, sub } from "date-fns";
+import { saveBooking } from "../actions/saveBooking";
+import { Loader2 } from "lucide-react";
 
 interface ServiceItemProps {
   service: BarbershopServices;
@@ -31,15 +34,14 @@ const ServiceItem = ({
   barbershop,
   isAuthenticated,
 }: ServiceItemProps) => {
+  const [isSubmitLoading, setIsSubmitLoading] = useState(false);
+  const { data } = useSession();
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [hour, setHour] = useState<String | undefined>();
 
   const handleDateClick = (date: Date | undefined) => {
     setDate(date);
     setHour(undefined);
-
-    console.log(date);
-    console.log(hour);
   };
 
   const hancleHourClick = (time: string) => {
@@ -49,6 +51,32 @@ const ServiceItem = ({
   const handleBookingClick = () => {
     if (!isAuthenticated) {
       return signIn("google");
+    }
+  };
+
+  const handleBookingSubmit = async () => {
+    setIsSubmitLoading(true);
+    try {
+      if (!date || !hour || !data?.user) {
+        return;
+      }
+
+      const dateHour = Number(hour.split(":")[0]);
+      const dateMinutes = Number(hour.split(":")[1]);
+      console.log(dateHour);
+      console.log(dateMinutes);
+      const newDate = setMinutes(setHours(date, dateHour), dateMinutes);
+      console.log(newDate);
+
+      await saveBooking({
+        barbershopId: barbershop.id,
+        serviceId: service.id,
+        date: newDate,
+        userId: (data.user as any).id,
+      });
+    } catch (error) {
+    } finally {
+      setIsSubmitLoading(false);
     }
   };
 
@@ -182,10 +210,12 @@ const ServiceItem = ({
                   </div>
                   <SheetFooter className="px-5">
                     <Button
+                      onClick={handleBookingSubmit}
                       variant="default"
-                      disabled={!(date && hour)}
+                      disabled={!hour || !date || isSubmitLoading}
                       className="text-white w-full"
                     >
+                      {isSubmitLoading && <Loader2 className="animate-spin" />}
                       Confirmar Reserva
                     </Button>
                   </SheetFooter>
