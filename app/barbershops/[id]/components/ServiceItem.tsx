@@ -175,10 +175,10 @@ const ServiceItem = ({
                   </Button>
                 </SheetTrigger>
                 <SheetContent className="p-0">
-                  <SheetHeader className="border-b border-solid border-secondary p-5">
+                  <SheetHeader className="text-left border-b border-solid border-secondary p-5">
                     <SheetTitle>Fazer Reserva</SheetTitle>
                   </SheetHeader>
-                  <div className="py-4">
+                  <div className="w-full ">
                     <Calendar
                       mode="single"
                       selected={date}
@@ -195,6 +195,7 @@ const ServiceItem = ({
                         },
                         button: {
                           width: "100%",
+                          aspectRatio: "1 / 1",
                         },
                         nav_button_previous: {
                           width: "32px",
