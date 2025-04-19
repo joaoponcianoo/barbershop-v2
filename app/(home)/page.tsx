@@ -49,14 +49,18 @@ export default async function Home() {
       </div>
 
       <div className="mt-6 px-5">
-        <h2 className="text-sm uppercase text-gray-400 font-bold mb-3">
-          Agendamentos
-        </h2>
-        <div className="flex gap-3 ">
-          {confirmedBookings.map((booking) => (
-            <BookingItem key={booking.id} booking={booking} />
-          ))}
-        </div>
+        {confirmedBookings.length > 0 && (
+          <>
+            <h2 className="text-sm uppercase text-gray-400 font-bold mb-3">
+              Agendamentos
+            </h2>
+            <div className="flex gap-3 ">
+              {confirmedBookings.map((booking) => (
+                <BookingItem key={booking.id} booking={booking} />
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       <div className="mt-6 px-5">
