@@ -19,7 +19,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { generateDayTimeList } from "../utils/hours";
 import format from "date-fns/format";
-import { set, setHours, setMinutes, sub } from "date-fns";
+import { setHours, setMinutes } from "date-fns";
 import { saveBooking } from "../actions/saveBooking";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -82,10 +82,7 @@ const ServiceItem = ({
 
       const dateHour = Number(hour.split(":")[0]);
       const dateMinutes = Number(hour.split(":")[1]);
-      console.log(dateHour);
-      console.log(dateMinutes);
       const newDate = setMinutes(setHours(date, dateHour), dateMinutes);
-      console.log(newDate);
 
       await saveBooking({
         barbershopId: barbershop.id,
